@@ -5,12 +5,18 @@ getCategoryAPI return a list of item
 asynchronously call api and return it into Map with mapping
 */
 import api from "./service/api";
+/**
+ * @returns {array} array of asynchronous function calling api of category item
+ * getListCategoryAPI  is api get Category List
+ * getCategoryAPI is api get category item
+ */
+
 async function getListCategory() {
-  // create array api call
+  // create array api call get category item
+  let queue = [];
   try {
     const { data: categories, success } = await api("getListCategoryAPI");
     if (!success) return false;
-    let queue = [];
     if (categories) {
       //mapping function to an array of function
       queue = categories.map((item) => {
@@ -22,13 +28,17 @@ async function getListCategory() {
         });
       });
     }
-    return queue;
   } catch (error) {
     console.log("getListCategory ERROR(s) occurs", error);
   }
-  return false;
+  return queue;
 }
+/**
+ * get category data and return it into object
+ * @returns {object} object of categories data
+ */
 async function getData() {
+  let result = {};
   try {
     const queue = await getListCategory();
     //executing  array of asynchronous
@@ -36,11 +46,11 @@ async function getData() {
     const arrayResponse = await Promise.all(_queue);
     let result = {};
     queue.forEach((item, index) => {
-      result[item.id] = arrayResponse[index];
+      result[item.id] = arrayResponse[index].success ? arrayResponse[data] : [];
     });
-    return result;
   } catch (error) {
     console.log("getData ERROR(s) occurs", error);
   }
-  return false;
+  return result;
 }
+export default getData;

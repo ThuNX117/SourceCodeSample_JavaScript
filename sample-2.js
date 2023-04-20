@@ -1,7 +1,7 @@
-/*
-convert a WYSIWYG HTML  to Object of contents
-migration from old WYSIWYG like *vue-wysiwyg to new WYSIWYG like : tiptap,ckEditor
-*/
+/**
+ * Convert a WYSIWYG HTML  to Object of contents
+ * Migration from old WYSIWYG like *vue-wysiwyg to new WYSIWYG like : tiptap,ckEditor  */
+
 const NODE_TYPE = {
   HASHTAG: "hashtag",
   MENTION: "mention",
@@ -22,13 +22,24 @@ const ALIAS = {
   MENTION: "@",
   HASHTAG: "#",
 };
-
+/**
+ * Returns Object contains information of HTML text fundamentals.
+ *
+ * @param {HTMLDivElement} childTag the HTML node need to be convert to Object
+ * @return {object} object contains data of HTML node
+ */
 function walkText(_node) {
   return {
     type: NODE_TYPE.TEXT,
     text: _node.nodeValue,
   };
 }
+/**
+ * Returns Object contains information of The Content Span element
+ *
+ * @param {HTMLDivElement} childTag the HTML node need to be convert to Object
+ * @return {resultObject} object contains data of HTML node
+ */
 function walkSpan(childTag) {
   // read span HTML and return object of contents
   let resultObject = {};
@@ -52,6 +63,12 @@ function walkSpan(childTag) {
   }
   return resultObject;
 }
+/**
+ * Returns Object contains information of The Content Division element.
+ *
+ * @param {HTMLDivElement} _node the HTML node need to be convert to Object
+ * @return {resultObject} object contains data of HTML node
+ */
 function walkDiv(_node) {
   let resultObject = {};
   let content = [];
@@ -73,9 +90,14 @@ function walkDiv(_node) {
   }
   return resultObject;
 }
-function migrationNote() {
+/**
+ * Returns Object contains information of HTML.
+ * @param {string} id of HTML that need to convert to Object
+ * @return {object} object tree contains data of HTML input
+ */
+function migrationNote(id) {
   /* convert HTML to object of contents, this object can be put into new WYSIWYG editor*/
-  const doc = document.getElementById("editor-migration");
+  const doc = document.getElementById(id);
   let migrationNode = {
     type: "doc",
     content: [],
@@ -86,17 +108,29 @@ function migrationNote() {
   }
   return migrationNode;
 }
+/**
+ * Returns return string of noteType
+ *
+ * @param {HTMLDivElement} nodeName is string alias of HTML tag
+ * @return {object}  is String match alias of HTML tag
+ */
 function typeOfNode(nodeName) {
   const noteType = {
     B: "bold",
     I: "italic",
     U: "underline",
   };
-
-  return noteType[nodeName] || "";
+  let result = noteType[nodeName] || "";
+  return result;
 }
+
+/**
+ * Clean object that was create by methods: minify and optimize layer.
+ *
+ * @param {object} nodeJSON HTML Node in JSON type
+ * @return {object} object tree contains data of node
+ */
 function passDownMarks(nodeJSON) {
-  //clean object that was create by methods: minify and optimize layer.
   let resultObject = structuredClone(nodeJSON);
   let marks;
   if (resultObject && resultObject.marks) {
@@ -111,12 +145,17 @@ function passDownMarks(nodeJSON) {
           item.marks = structuredClone(marks);
         }
       });
-      // delete resultObject.marks
       delete resultObject.text;
     }
   }
   return resultObject;
 }
+/**
+ * Simplify multi-line text
+ *
+ * @param {object} $node The HTML node in json type need to be simplify
+ * @return {object} Node has been simplify
+ */
 function simplifyMultipleText($node) {
   let node = structuredClone($node);
   let content = [];
@@ -140,6 +179,12 @@ function simplifyMultipleText($node) {
   }
   return node;
 }
+/**
+ * simplify Node object
+ *
+ * @param {object} $node the HTML node in json type need to be simplify
+ * @return {object} node has been simplify
+ */
 function simplifyNodeObject($node) {
   const node = structuredClone($node);
   let result;
@@ -159,11 +204,14 @@ function simplifyNodeObject($node) {
   return result;
 }
 
+/**
+ * Walk to every node of HTML's DOM tree and create object contains information
+ *
+ * @param {object} _node The HTML node need to parse into object-like
+ * @return {object} object tree contains data of _node
+ */
+
 function nodeWalk(_node) {
-  /*recursive method:
-  GO TO EVERY NODE, 
-  return Object of CONTENT
-   */
   const vm = this;
   let resultObject = {};
   if (!_node) {
@@ -192,7 +240,6 @@ function nodeWalk(_node) {
         marks: [{ type: vm.typeOfNode(_node.nodeName) }],
       };
       _node.childNodes.forEach((item) => {
-        //recursive deep into html DOM
         content = content.concat(vm.nodeWalk(item));
       });
       resultObject.content = content;
