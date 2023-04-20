@@ -4,6 +4,7 @@ getListCategoryAPI return a list of category
 getCategoryAPI return a list of item 
 asynchronously call api and return it into Map with mapping
 */
+import api from "./service/api";
 async function getListCategory() {
   // create array api call
   try {
